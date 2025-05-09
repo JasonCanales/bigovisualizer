@@ -1,22 +1,26 @@
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*.egg-info/
-.env
-.venv
+*.pyo
+
+# Virtual environments
 venv/
+.env/
 
-# SAM build artifacts
+# AWS SAM build artifacts
 .aws-sam/
+.cache/
+*.zip
 
-# OS files
-.DS_Store
-Thumbs.db
+# Zappa artifacts
+.zappa-*
 
-# Node/Frontend artifacts (if you add later)
-node_modules/
-dist/
-
-# Editor folders
+# Editor & system files
 .vscode/
-.idea/
+.DS_Store
+
+# Node modules (if ever added for frontend)
+node_modules/
+
+# Archive folder
+archive/
