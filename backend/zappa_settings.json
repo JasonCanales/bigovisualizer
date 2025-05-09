@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "app_function": "main.handler",
+    "aws_region": "us-east-1",
+    "profile_name": "jason-ubuntu-laptop",
+    "project_name": "bigovisualizer",
+    "runtime": "python3.9",
+    "s3_bucket": "bigovisualizer-deploy",
+    "apigateway_enabled": true,
+    "manage_roles": true,
+    "binary_support": false,
+    "touch": false,
+    "endpoint_configuration": ["REGIONAL"],
+    "timeout_seconds": 30,
+    "exclude": [
+      "boto3",
+      "botocore",
+      "s3transfer",
+      "concurrent",
+      "dateutil"
+    ]
+  }
+}

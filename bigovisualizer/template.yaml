@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Big-O Visualizer — FastAPI + Mangum powered by AWS Lambda
+
+Globals:
+  Function:
+    Timeout: 10
+    Tracing: Active  # Enable X-Ray tracing
+
+Resources:
+  BigOVisualizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: bigovisualizer
+      Handler: app.handler
+      Runtime: python3.9
+      CodeUri: hello_world/
+      MemorySize: 512
+      Tracing: Active
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+        Root:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+
+Outputs:
+  BigOApi:
+    Description: "API Gateway endpoint URL for Big-O Visualizer"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

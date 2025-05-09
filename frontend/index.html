@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Big-O Visualizer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center justify-start p-6">
+
+  <div class="max-w-2xl w-full">
+    <h1 class="text-4xl font-bold text-center mb-4">📈 Big-O Visualizer</h1>
+    <p class="text-center mb-6 text-lg sm:text-xl">
+      See how different time complexities grow as input size increases.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 items-center justify-center mb-4">
+      <select id="bigOType" class="p-2 rounded border w-full sm:w-auto text-gray-900">
+        <option value="O(1)">O(1)</option>
+        <option value="O(log n)">O(log n)</option>
+        <option value="O(n)">O(n)</option>
+        <option value="O(n log n)">O(n log n)</option>
+        <option value="O(n^2)">O(n²)</option>
+        <option value="O(2^n)">O(2ⁿ)</option>
+      </select>
+      <button id="toggleDark" class="px-4 py-2 rounded bg-gray-800 text-white hover:bg-gray-700">
+        Toggle Dark Mode
+      </button>
+      <button id="download" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-500">
+        Download Chart
+      </button>
+    </div>
+
+    <div class="mb-4 text-center text-md sm:text-lg italic" id="complexityDescription"></div>
+
+    <canvas id="bigOChart" height="300"></canvas>
+  </div>
+
+  <footer class="mt-12 text-sm text-center opacity-60">
+    Built by <a href="https://www.linkedin.com/in/jason-canales/" class="underline" target="_blank">Jason Canales</a> &middot;
+    <a href="https://github.com/yourusername/big-o-visualizer" class="underline" target="_blank">View Source</a>
+  </footer>  
+
+  <script>
+    const apiBase = "https://48doisfimg.execute-api.us-east-1.amazonaws.com/Prod";
+    const descriptions = {
+      "O(1)": "Constant time: no matter the input, it’s always fast.",
+      "O(log n)": "Logarithmic time: cuts the problem in half repeatedly.",
+      "O(n)": "Linear time: work grows directly with input size.",
+      "O(n log n)": "Efficient sorting: slightly more than linear.",
+      "O(n^2)": "Quadratic time: nested loops — gets slow quickly.",
+      "O(2^n)": "Exponential time: adds massive work with each step."
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const defaultType = params.get("type") || "O(n)";
+    const dropdown = document.getElementById("bigOType");
+    dropdown.value = defaultType;
+
+    const ctx = document.getElementById("bigOChart").getContext("2d");
+    let chart;
+
+    async function fetchData(type) {
+      const res = await fetch(`${apiBase}/bigO/${encodeURIComponent(type)}`);
+      return res.json();
+    }
+
+    async function updateChart(type) {
+      const data = await fetchData(type);
+      document.getElementById("complexityDescription").innerText = descriptions[type] || "";
+
+      const config = {
+        type: "line",
+        data: {
+          labels: data.n,
+          datasets: [{
+            label: type,
+            data: data.y,
+            fill: false,
+            borderColor: "rgb(75, 192, 192)",
+            tension: 0.15,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          animation: {
+            duration: 800,
+            easing: 'easeOutCubic'
+          },
+          responsive: true,
+          plugins: {
+            legend: { display: true }
+          },
+          scales: {
+            x: { title: { display: true, text: 'Input Size (n)' } },
+            y: { title: { display: true, text: 'Operations / Time' } }
+          }
+        }
+      };
+
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, config);
+    }
+
+    dropdown.addEventListener("change", e => {
+      const selected = e.target.value;
+      window.history.replaceState({}, "", `?type=${encodeURIComponent(selected)}`);
+      updateChart(selected);
+    });
+
+    document.getElementById("toggleDark").addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+    });
+
+    document.getElementById("download").addEventListener("click", () => {
+      const link = document.createElement('a');
+      link.download = "big-o-graph.png";
+      link.href = chart.toBase64Image();
+      link.click();
+    });
+
+    updateChart(defaultType);
+  </script>
+</body>
+</html>
