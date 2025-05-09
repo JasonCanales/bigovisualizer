@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.venv
+venv/
+
+# SAM build artifacts
+.aws-sam/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node/Frontend artifacts (if you add later)
+node_modules/
+dist/
+
+# Editor folders
+.vscode/
+.idea/

@@ -5,6 +5,16 @@ import math
 app = FastAPI()
 handler = Mangum(app)
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # ✅ frontend origin (you can add your S3/CloudFront domain here later)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 def root():
     return {"message": "Big-O Visualizer API is running!"}
