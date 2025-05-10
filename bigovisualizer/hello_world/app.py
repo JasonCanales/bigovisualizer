@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # ✅ frontend origin (you can add your S3/CloudFront domain here later)
+    allow_origins=["*"],  # or restrict to your S3 site URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
