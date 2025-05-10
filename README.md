@@ -1,30 +1,50 @@
 # 📈 Big-O Visualizer
 
-A dynamic, educational visualization of algorithmic time complexities — deployed fully serverlessly with AWS.
+An interactive web application that visualizes time complexity growth — from `O(1)` to `O(2ⁿ)` — using animated line charts and real-world input size examples.
 
-## 🔧 Stack
-
-- **Frontend**: HTML + TailwindCSS + Chart.js
-- **Backend**: FastAPI + Mangum, deployed to AWS Lambda via SAM
-- **Infrastructure**: AWS API Gateway, Lambda, CloudFormation (SAM), S3 (planned)
-- **Observability**: AWS X-Ray + CloudWatch
-- **CI/CD**: Manual deployment via AWS SAM CLI
+Built for both technical and non-technical audiences to intuitively explore how algorithms scale with input.
 
 ---
 
-## 🔍 Live Demo
+## 🌐 Live Demo
 
-Frontend: [Coming Soon](#)  
-API: [`/bigO/O(n^2)`](https://48doisfimg.execute-api.us-east-1.amazonaws.com/Prod/bigO/O(n^2))
+👉 [View the Live App](https://dhb5rlzn2ipkx.cloudfront.net/)
 
 ---
 
-## ✨ Features
+## 🧰 Tech Stack
 
-- Choose between O(1), O(log n), O(n), O(n log n), O(n²), O(2ⁿ)
-- Auto-generated chart with animated transitions
-- Toggle dark mode ☀️🌙
-- Download chart as PNG
-- API responds with JSON `{ n: [...], y: [...] }`
-- Fully responsive, mobile-friendly UI
-- Bookmarkable dropdown via query string (`?type=O(n^2)`)
+- **Backend**: Python, FastAPI, AWS Lambda, API Gateway
+- **Frontend**: HTML, JavaScript (Chart.js), TailwindCSS
+- **Infrastructure**: AWS S3 (static site hosting), CloudFront (HTTPS), SAM CLI
+- **Deployment**: Manual AWS CLI
+
+---
+
+## 📊 Features
+
+- Toggle between time complexities: `O(1)`, `O(log n)`, `O(n)`, `O(n log n)`, `O(n²)`, `O(2ⁿ)`
+- Interactive slider to increase input size (n) up to 10 million
+- Contextual examples that explain what “n” represents in real-world terms
+- Fully responsive UI with dark mode toggle
+- Fast, globally accessible hosting via CloudFront CDN
+
+---
+
+## 🧠 Why This Exists
+
+Understanding Big-O isn’t just about asymptotic notation — it’s about intuition. This tool helps learners, interviewers, and product managers visualize the practical impact of input growth.
+
+---
+
+## 🧑‍💻 Built By
+
+**Jason Canales**  
+🔗 [LinkedIn Profile](https://www.linkedin.com/in/jason-canales/)  
+💻 [GitHub Projects](https://github.com/JasonCanales)
+
+---
+
+## 📂 License
+
+MIT License. Free to use, fork, and expand.
