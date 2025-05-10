@@ -2,215 +2,234 @@
 <html lang="en" class="scroll-smooth">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Big-O Visualizer</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' };
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Big-O Visualizer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
 </head>
 
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col">
 
-    <!-- Navbar -->
-    <header class="w-full bg-white dark:bg-gray-800 shadow-sm p-4 mb-4">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-semibold tracking-tight">📈 Big-O Visualizer</h1>
-            <button id="toggleDark"
-                class="text-sm px-3 py-1 rounded border hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                Toggle Dark Mode
-            </button>
+  <!-- Navbar -->
+  <header class="w-full bg-white dark:bg-gray-800 shadow-sm p-4 mb-4">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <h1 class="text-xl font-semibold tracking-tight">📈 Big-O Visualizer</h1>
+      <button id="toggleDark"
+        class="text-sm px-3 py-1 rounded border hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+        Toggle Dark Mode
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex justify-center px-4">
+    <div class="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8">
+
+      <h2 class="text-3xl font-bold mb-2 text-center">Understand Time Complexity</h2>
+      <p class="text-center text-gray-600 dark:text-gray-300 mb-6">
+        Visualize how algorithm performance scales with input size.
+      </p>
+
+      <!-- Complexity Selection -->
+      <fieldset class="mb-4">
+        <legend class="text-md font-semibold mb-1 text-center">Select Complexities to Display</legend>
+        <div class="flex flex-wrap justify-center gap-3">
+          <label><input type="checkbox" value="O(1)" checked> O(1)</label>
+          <label><input type="checkbox" value="O(log n)" checked> O(log n)</label>
+          <label><input type="checkbox" value="O(n)" checked> O(n)</label>
+          <label><input type="checkbox" value="O(n log n)" checked> O(n log n)</label>
+          <label><input type="checkbox" value="O(n^2)" checked> O(n²)</label>
+          <label><input type="checkbox" value="O(2^n)"> O(2ⁿ)</label>
         </div>
-    </header>
+      </fieldset>
 
-    <!-- Main Content -->
-    <main class="flex-grow flex justify-center px-4">
-        <div class="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8">
-
-            <h2 class="text-3xl font-bold mb-2 text-center">Understand Time Complexity</h2>
-            <p class="text-center text-gray-600 dark:text-gray-300 mb-6">
-                Visualize how algorithm performance scales with input size.
-            </p>
-
-            <!-- Complexity Selection -->
-            <fieldset class="mb-4">
-                <legend class="text-md font-semibold mb-1 text-center">Select Complexities to Display</legend>
-                <div class="flex flex-wrap justify-center gap-3">
-                    <label><input type="checkbox" value="O(1)" checked> O(1)</label>
-                    <label><input type="checkbox" value="O(log n)" checked> O(log n)</label>
-                    <label><input type="checkbox" value="O(n)" checked> O(n)</label>
-                    <label><input type="checkbox" value="O(n log n)" checked> O(n log n)</label>
-                    <label><input type="checkbox" value="O(n^2)" checked> O(n²)</label>
-                    <label><input type="checkbox" value="O(2^n)"> O(2ⁿ)</label>
-                </div>
-            </fieldset>
-
-            <!-- Slider with Real-Life Context -->
-            <div class="my-6 text-center">
-                <label for="nSlider" class="block font-medium text-lg mb-1">
-                    Input Size (n): <span id="nValue" class="font-semibold">100</span>
-                </label>
-                <input id="nSlider" type="range" min="1" max="7" value="2" step="1"
-                    class="w-full sm:w-2/3 mx-auto mb-2">
-                <div id="nExample" class="text-sm text-gray-600 dark:text-gray-300 italic transition-all">
-                    Example: 100 search results returned from a database
-                </div>
-            </div>
-
-            <!-- Explanation -->
-            <div id="explanationText" class="text-center text-sm sm:text-base italic mb-6">
-                Hover over any line to see how each algorithm scales.
-            </div>
-
-            <!-- Chart Container -->
-            <div class="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border dark:border-gray-700">
-                <canvas id="bigOChart" height="300"></canvas>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-wrap justify-center gap-4 mt-6">
-                <a href="https://github.com/JasonCanales/bigovisualizer" target="_blank"
-                    class="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                    View Source on GitHub
-                </a>
-            </div>
-
+      <!-- Slider with Real-Life Context -->
+      <div class="my-6 text-center">
+        <label for="nSlider" class="block font-medium text-lg mb-1">
+          Input Size (n): <span id="nValue" class="font-semibold">100</span>
+        </label>
+        <input id="nSlider" type="range" min="1" max="6" value="2" step="1"
+          class="w-full sm:w-2/3 mx-auto mb-2">
+        <div id="nExample" class="text-sm text-gray-600 dark:text-gray-300 italic transition-all">
+          Example: 100 search results returned from a database
         </div>
-    </main>
+      </div>
 
-    <!-- Footer -->
-    <footer class="text-sm text-center mt-10 mb-4 text-gray-500">
-        Built by <a href="https://www.linkedin.com/in/jason-canales/" target="_blank" class="underline">Jason
-            Canales</a>
-    </footer>
+      <!-- Explanation -->
+      <div id="explanationText" class="text-center text-sm sm:text-base italic mb-6">
+        Hover over any line to see how each algorithm scales.
+      </div>
 
-    <script>
-        function debounce(fn, delay = 200) {
-            let timer;
-            return function (...args) {
-                clearTimeout(timer);
-                timer = setTimeout(() => fn.apply(this, args), delay);
-            };
-        };
-        const apiBase = "https://48doisfimg.execute-api.us-east-1.amazonaws.com/Prod";
-        const ctx = document.getElementById("bigOChart").getContext("2d");
-        const nValueLabel = document.getElementById("nValue");
-        const nSlider = document.getElementById("nSlider");
-        const checkboxes = document.querySelectorAll("input[type=checkbox]");
-        let chart;
+      <!-- Chart Container -->
+      <div class="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border dark:border-gray-700">
+        <canvas id="bigOChart" height="300"></canvas>
+      </div>
 
-        async function fetchData(type, n) {
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap justify-center gap-4 mt-6">
+        <a href="https://github.com/JasonCanales/bigovisualizer" target="_blank"
+          class="px-4 py-2 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+          View Source on GitHub
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-sm text-center mt-10 mb-4 text-gray-500">
+    Built by <a href="https://www.linkedin.com/in/jason-canales/" target="_blank" class="underline">Jason Canales</a>
+  </footer>
+
+  <script>
+    function debounce(fn, delay = 200) {
+      let timer;
+      return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
+
+    const apiBase = "https://48doisfimg.execute-api.us-east-1.amazonaws.com/Prod";
+    const ctx = document.getElementById("bigOChart").getContext("2d");
+    const nValueLabel = document.getElementById("nValue");
+    const nSlider = document.getElementById("nSlider");
+    const checkboxes = document.querySelectorAll("input[type=checkbox]");
+    let chart;
+
+    const preloadNs = [100000, 500000, 1000000];
+    const preloadCache = {};
+    const types = ["O(1)", "O(log n)", "O(n)", "O(n log n)", "O(n^2)", "O(2^n)"];
+
+    async function preloadHeavyData() {
+      for (const n of preloadNs) {
+        for (const type of types) {
+          const key = `${type}_${n}`;
+          try {
             const res = await fetch(`${apiBase}/bigO/${encodeURIComponent(type)}?n=${n}`);
-            return res.json();
+            preloadCache[key] = await res.json();
+          } catch (e) {
+            console.warn(`Failed to preload ${key}`, e);
+          }
         }
+      }
+    }
 
-        async function updateChart() {
-            const selectedTypes = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-            const nMap = {
-                1: 10,
-                2: 100,
-                3: 1000,
-                4: 10000,
-                5: 100000,
-                6: 1000000,
-                7: 10000000
-            };
-            const n = nMap[nSlider.value];
+    async function fetchData(type, n) {
+      const key = `${type}_${n}`;
+      if (preloadCache[key]) {
+        return preloadCache[key];
+      }
+      const res = await fetch(`${apiBase}/bigO/${encodeURIComponent(type)}?n=${n}`);
+      const data = await res.json();
+      if (preloadNs.includes(n)) {
+        preloadCache[key] = data;
+      }
+      return data;
+    }
 
-            nValueLabel.textContent = n.toLocaleString();
+    async function updateChart() {
+      const selectedTypes = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+      const nMap = {
+        1: 10,
+        2: 100,
+        3: 1000,
+        4: 10000,
+        5: 100000,
+        6: 1000000
+      };
+      const n = nMap[nSlider.value];
+      nValueLabel.textContent = n.toLocaleString();
 
-            const examples = [
-                [1, "1 API request from a user"],
-                [10, "10 items in a shopping cart"],
-                [50, "50 users in a small Slack workspace"],
-                [100, "100 search results returned from a database"],
-                [500, "500 customer reviews on a product"],
-                [1000, "1,000 users in a SaaS dashboard"],
-                [5000, "5,000 support tickets in a help desk"],
-                [10000, "10,000 products in a regional warehouse"],
-                [50000, "50,000 orders placed during a flash sale"],
-                [100000, "100,000 rows scanned in a query"],
-                [1000000, "1 million customers using the app in a week"],
-                [10000000, "10 million Amazon items scanned for deals"],
-                [100000000, "100 million logs processed from microservices"],
-                [1000000000, "1 billion data points for observability"]
-            ];
-            let closest = examples.reduce((prev, curr) =>
-                Math.abs(curr[0] - n) < Math.abs(prev[0] - n) ? curr : prev
-            );
-            document.getElementById("nExample").textContent = `Example: ${closest[1]}`;
+      const examples = [
+        [1, "1 API request from a user"],
+        [10, "10 items in a shopping cart"],
+        [50, "50 users in a small Slack workspace"],
+        [100, "100 search results returned from a database"],
+        [500, "500 customer reviews on a product"],
+        [1000, "1,000 users in a SaaS dashboard"],
+        [5000, "5,000 support tickets in a help desk"],
+        [10000, "10,000 products in a regional warehouse"],
+        [50000, "50,000 orders placed during a flash sale"],
+        [100000, "100,000 rows scanned in a query"],
+        [1000000, "1 million customers using the app in a week"]
+      ];
+      const closest = examples.reduce((prev, curr) =>
+        Math.abs(curr[0] - n) < Math.abs(prev[0] - n) ? curr : prev
+      );
+      document.getElementById("nExample").textContent = `Example: ${closest[1]}`;
 
-            const MAX_POINTS = 1000;
-            const step = Math.max(1, Math.floor(n / MAX_POINTS));
-            const n_values = [];
-            for (let i = 1; i <= n; i += step) {
-                n_values.push(i);
-            }
+      const MAX_POINTS = 1000;
+      const step = Math.max(1, Math.floor(n / MAX_POINTS));
+      const n_values = [];
+      for (let i = 1; i <= n; i += step) {
+        n_values.push(i);
+      }
 
-            const datasets = await Promise.all(selectedTypes.map(async type => {
-                const data = await fetchData(type, n);
-                const y_downsampled = n_values.map(i => data.y[i - 1] ?? null);
-                return {
-                    label: type,
-                    data: y_downsampled,
-                    fill: false,
-                    tension: 0.25,
-                    pointRadius: 0,
-                    borderWidth: 2,
-                    borderColor: getColor(type)
-                };
-            }));
+      const datasets = await Promise.all(selectedTypes.map(async type => {
+        const data = await fetchData(type, n);
+        const y_downsampled = n_values.map(i => data.y[i - 1] ?? null);
+        return {
+          label: type,
+          data: y_downsampled,
+          fill: false,
+          tension: 0.25,
+          pointRadius: 0,
+          borderWidth: 2,
+          borderColor: getColor(type)
+        };
+      }));
 
-            const config = {
-                type: "line",
-                data: {
-                    labels: n_values,
-                    datasets: datasets
-                },
-                options: {
-                    animation: { duration: 600 },
-                    responsive: true,
-                    plugins: {
-                        tooltip: { mode: 'index', intersect: false },
-                        legend: { display: true }
-                    },
-                    scales: {
-                        x: { title: { display: true, text: "Input Size (n)" } },
-                        y: { title: { display: true, text: "Operations / Time" } }
-                    }
-                }
-            };
-
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, config);
+      const config = {
+        type: "line",
+        data: { labels: n_values, datasets },
+        options: {
+          animation: { duration: 600 },
+          responsive: true,
+          plugins: {
+            tooltip: { mode: 'index', intersect: false },
+            legend: { display: true }
+          },
+          scales: {
+            x: { title: { display: true, text: "Input Size (n)" } },
+            y: { title: { display: true, text: "Operations / Time" } }
+          }
         }
+      };
 
-        function getColor(type) {
-            const colors = {
-                "O(1)": "#6366F1",
-                "O(log n)": "#60A5FA",
-                "O(n)": "#22C55E",
-                "O(n log n)": "#FBBF24",
-                "O(n^2)": "#F43F5E",
-                "O(2^n)": "#A855F7"
-            };
-            return colors[type] || "black";
-        }
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, config);
+    }
 
-        document.getElementById("toggleDark").addEventListener("click", () => {
-            document.documentElement.classList.toggle("dark");
-        });
-        window.addEventListener("resize", () => {
-            chart.resize();
-        });
+    function getColor(type) {
+      const colors = {
+        "O(1)": "#6366F1",
+        "O(log n)": "#60A5FA",
+        "O(n)": "#22C55E",
+        "O(n log n)": "#FBBF24",
+        "O(n^2)": "#F43F5E",
+        "O(2^n)": "#A855F7"
+      };
+      return colors[type] || "black";
+    }
 
-        nSlider.addEventListener("input", debounce(updateChart, 250));
-        checkboxes.forEach(cb => cb.addEventListener("change", updateChart));
+    document.getElementById("toggleDark").addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
+    });
 
-        updateChart();
-    </script>
+    window.addEventListener("resize", () => {
+      chart.resize();
+    });
+
+    preloadHeavyData();  // Start background preload
+    nSlider.addEventListener("input", debounce(updateChart, 250));
+    checkboxes.forEach(cb => cb.addEventListener("change", updateChart));
+    updateChart();
+  </script>
 </body>
 
 </html>

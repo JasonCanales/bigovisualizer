@@ -11,7 +11,7 @@
 
 # Settings
 S3_BUCKET="jasoncanales-bigovisualizer"
-CLOUDFRONT_DIST_ID="dvpc9iywq58ni"
+CLOUDFRONT_DIST_ID="E192HU619WNWHB"
 
 # Prompt for commit message
 read -rp "🔧 Enter a brief Git commit message: " COMMIT_MSG
