@@ -142,11 +142,19 @@
             );
             document.getElementById("nExample").textContent = `Example: ${closest[1]}`;
 
+            const MAX_POINTS = 1000;
+            const step = Math.max(1, Math.floor(n / MAX_POINTS));
+            const n_values = [];
+            for (let i = 1; i <= n; i += step) {
+                n_values.push(i);
+            }
+
             const datasets = await Promise.all(selectedTypes.map(async type => {
                 const data = await fetchData(type, n);
+                const y_downsampled = n_values.map(i => data.y[i - 1] ?? null);
                 return {
                     label: type,
-                    data: data.y,
+                    data: y_downsampled,
                     fill: false,
                     tension: 0.25,
                     pointRadius: 0,
@@ -155,10 +163,12 @@
                 };
             }));
 
-            const labels = Array.from({ length: n }, (_, i) => i + 1);
             const config = {
                 type: "line",
-                data: { labels, datasets },
+                data: {
+                    labels: n_values,
+                    datasets: datasets
+                },
                 options: {
                     animation: { duration: 600 },
                     responsive: true,
@@ -172,9 +182,9 @@
                     }
                 }
             };
+
             if (chart) chart.destroy();
             chart = new Chart(ctx, config);
-
         }
 
         function getColor(type) {
@@ -192,9 +202,9 @@
         document.getElementById("toggleDark").addEventListener("click", () => {
             document.documentElement.classList.toggle("dark");
         });
-window.addEventListener("resize", () => {
-  chart.resize();
-});
+        window.addEventListener("resize", () => {
+            chart.resize();
+        });
 
         nSlider.addEventListener("input", debounce(updateChart, 250));
         checkboxes.forEach(cb => cb.addEventListener("change", updateChart));
