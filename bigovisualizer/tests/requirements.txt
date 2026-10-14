@@ -1,3 +1,4 @@
 pytest
+httpx
 boto3
 requests
