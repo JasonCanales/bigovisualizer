@@ -30,16 +30,26 @@ class TestApiGateway:
 
         stacks = response["Stacks"]
         stack_outputs = stacks[0]["Outputs"]
-        api_outputs = [output for output in stack_outputs if output["OutputKey"] == "HelloWorldApi"]
+        api_outputs = [output for output in stack_outputs if output["OutputKey"] == "BigOApi"]
 
         if not api_outputs:
-            raise KeyError(f"HelloWorldAPI not found in stack {stack_name}")
+            raise KeyError(f"BigOApi not found in stack {stack_name}")
 
         return api_outputs[0]["OutputValue"]  # Extract url from stack outputs
 
     def test_api_gateway(self, api_gateway_url):
         """ Call the API Gateway endpoint and check the response """
-        response = requests.get(api_gateway_url)
+        response = requests.get(api_gateway_url, timeout=15)
 
         assert response.status_code == 200
-        assert response.json() == {"message": "hello world"}
+        assert response.json() == {"message": "Big-O Visualizer API is running!"}
+
+        response = requests.get(
+            api_gateway_url.rstrip("/") + "/bigO/O(n)",
+            params={"n": 100000}, timeout=15,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["n"]) == len(data["y"]) == 1000
+        assert data["n"][0] == 1 and data["n"][-1] == 100000
+        assert data["y"] == data["n"]

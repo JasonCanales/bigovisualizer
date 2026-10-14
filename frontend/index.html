@@ -58,6 +58,7 @@
             </div>
 
             <!-- Chart Container -->
+            <p id="chartError" role="alert" class="hidden text-center text-red-600 mb-3"></p>
             <div class="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border dark:border-gray-700">
                 <canvas id="bigOChart" height="300"></canvas>
             </div>
@@ -93,6 +94,7 @@
         const nValueLabel = document.getElementById("nValue");
         const nSlider = document.getElementById("nSlider");
         let chart;
+        let updateVersion = 0;
 
         const complexityTypes = ["O(1)", "O(log n)", "O(n)", "O(n log n)", "O(n^2)", "O(2^n)"];
         const selectedTypes = new Set(["O(1)", "O(log n)"]); // Default selection
@@ -127,79 +129,81 @@
 
         async function fetchData(type, n) {
             const res = await fetch(`${apiBase}/bigO/${encodeURIComponent(type)}?n=${n}`);
+            if (!res.ok) throw new Error(`Unable to load chart data (HTTP ${res.status}). Please try again.`);
             return res.json();
         }
 
         async function updateChart() {
-            const nMap = {
-                1: 10,
-                2: 100,
-                3: 1000,
-                4: 10000,
-                5: 50000,
-                6: 100000
-            };
-            const n = nMap[nSlider.value];
-            nValueLabel.textContent = n.toLocaleString();
-
-            const examples = [
-                [10, "10 items in a shopping cart"],
-                [100, "100 search results returned from a database"],
-                [1000, "1,000 users in a SaaS dashboard"],
-                [10000, "10,000 products in a regional warehouse"],
-                [50000, "50,000 orders placed during a flash sale"],
-                [100000, "100,000 rows scanned in a query"]
-            ];
-            let closest = examples.reduce((prev, curr) =>
-                Math.abs(curr[0] - n) < Math.abs(prev[0] - n) ? curr : prev
-            );
-            document.getElementById("nExample").textContent = `Example: ${closest[1]}`;
-
-            const MAX_POINTS = 1000;
-            const step = Math.max(1, Math.floor(n / MAX_POINTS));
-            const n_values = [];
-            for (let i = 1; i <= n; i += step) {
-                n_values.push(i);
-            }
-
-            const types = Array.from(selectedTypes);
-
-            const datasets = await Promise.all(types.map(async type => {
-                const data = await fetchData(type, n);
-                const y_downsampled = n_values.map(i => data.y[i - 1] ?? null);
-                return {
-                    label: type,
-                    data: y_downsampled,
-                    fill: false,
-                    tension: 0.25,
-                    pointRadius: 0,
-                    borderWidth: 2,
-                    borderColor: getColor(type)
+            const version = ++updateVersion;
+            const errorLabel = document.getElementById("chartError");
+            errorLabel.classList.add("hidden");
+            try {
+                const nMap = {
+                    1: 10,
+                    2: 100,
+                    3: 1000,
+                    4: 10000,
+                    5: 50000,
+                    6: 100000
                 };
-            }));
+                const n = nMap[nSlider.value];
+                nValueLabel.textContent = n.toLocaleString();
 
-            const config = {
-                type: "line",
-                data: {
-                    labels: n_values,
-                    datasets: datasets
-                },
-                options: {
-                    animation: { duration: 600 },
-                    responsive: true,
-                    plugins: {
-                        tooltip: { mode: 'index', intersect: false },
-                        legend: { display: true }
+                const examples = [
+                    [10, "10 items in a shopping cart"],
+                    [100, "100 search results returned from a database"],
+                    [1000, "1,000 users in a SaaS dashboard"],
+                    [10000, "10,000 products in a regional warehouse"],
+                    [50000, "50,000 orders placed during a flash sale"],
+                    [100000, "100,000 rows scanned in a query"]
+                ];
+                let closest = examples.reduce((prev, curr) =>
+                    Math.abs(curr[0] - n) < Math.abs(prev[0] - n) ? curr : prev
+                );
+                document.getElementById("nExample").textContent = `Example: ${closest[1]}`;
+
+                const types = Array.from(selectedTypes);
+
+                const datasets = await Promise.all(types.map(async type => {
+                    const data = await fetchData(type, n);
+                    return {
+                        label: type,
+                        data: data.n.map((x, i) => ({ x, y: data.y[i] })),
+                        fill: false,
+                        tension: 0.25,
+                        pointRadius: 0,
+                        borderWidth: 2,
+                        borderColor: getColor(type)
+                    };
+                }));
+                if (version !== updateVersion) return;
+
+                const config = {
+                    type: "line",
+                    data: {
+                        datasets: datasets
                     },
-                    scales: {
-                        x: { title: { display: true, text: "Input Size (n)" } },
-                        y: { title: { display: true, text: "Operations / Time" } }
+                    options: {
+                        animation: { duration: 600 },
+                        responsive: true,
+                        plugins: {
+                            tooltip: { mode: 'nearest', axis: 'x', intersect: false },
+                            legend: { display: true }
+                        },
+                        scales: {
+                            x: { type: "linear", min: 1, max: n, title: { display: true, text: "Input Size (n)" } },
+                            y: { title: { display: true, text: "Operations / Time" } }
+                        }
                     }
-                }
-            };
+                };
 
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, config);
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, config);
+            } catch (error) {
+                if (version !== updateVersion) return;
+                errorLabel.textContent = error.message;
+                errorLabel.classList.remove("hidden");
+            }
         }
 
         function getColor(type) {

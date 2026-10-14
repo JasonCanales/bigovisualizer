@@ -1,5 +1,5 @@
-import math, os, json
-from fastapi import FastAPI, Query
+import math
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 
@@ -18,8 +18,20 @@ app.add_middleware(
 def root():
     return {"message": "Big-O Visualizer API is running!"}
 
+MAX_INPUT = 100_000
+MAX_POINTS = 1_000
+
+
+def sample_inputs(n: int):
+    """Evenly space integer inputs, retaining both endpoints without duplicates."""
+    count = min(n, MAX_POINTS)
+    if count == 1:
+        return [1]
+    return [1 + i * (n - 1) // (count - 1) for i in range(count)]
+
+
 @app.get("/bigO/{type}")
-def get_big_o(type: str, n: int = Query(...)):
+def get_big_o(type: str, n: int = Query(..., ge=1, le=MAX_INPUT)):
     funcs = {
         "O(1)": lambda n: 1,
         "O(log n)": lambda n: math.log2(n),
@@ -29,16 +41,15 @@ def get_big_o(type: str, n: int = Query(...)):
         "O(2^n)": lambda n: 2**n if n < 20 else None,
     }
 
-    safe_name = type.replace(" ", "_").replace("^", "").replace("(", "").replace(")", "")
-    file_path = f"/var/task/precomputed/{safe_name}_{n}.json"
-
-    if os.path.exists(file_path):
-        with open(file_path) as f:
-            return json.load(f)
-
     if type not in funcs:
-        return {"error": "Invalid type"}
+        raise HTTPException(status_code=400, detail="Invalid complexity type")
 
-    x = list(range(1, n + 1))
+    if type == "O(2^n)":
+        # Retain every visible exponential point and the null cutoff at 20.
+        x = list(range(1, min(n, 20) + 1))
+        if n > 20:
+            x.append(n)
+    else:
+        x = sample_inputs(n)
     y = [funcs[type](i) for i in x]
     return {"n": x, "y": y}
